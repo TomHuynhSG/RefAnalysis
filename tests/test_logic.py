@@ -38,6 +38,9 @@ def test_logic():
         
     for item in unique_a:
         print(f"  Unique A Item: {item.get('title') or item.get('ti')}")
+        print(f"  Type: {item.get('type_of_reference', 'UNK')} (Expected 'BOOK')")
+
+    # Test Abstract Parsing (implied if we add abstract to sample)
 
     # Test Analysis
     stats_a = analyze_references(df_a)

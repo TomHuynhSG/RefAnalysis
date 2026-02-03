@@ -44,11 +44,12 @@
         <table id="refTable">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)">Type</th>
-                    <th onclick="sortTable(1)">Year</th>
-                    <th onclick="sortTable(2)">Title</th>
-                    <th onclick="sortTable(3)">Authors</th>
-                    <th onclick="sortTable(4)">Journal</th>
+                    <th onclick="sortTable(0, 'refTable')">Type</th>
+                    <th onclick="sortTable(1, 'refTable')">Year</th>
+                    <th onclick="sortTable(2, 'refTable')">Title</th>
+                    <th onclick="sortTable(3, 'refTable')">Authors</th>
+                    <th onclick="sortTable(4, 'refTable')">Journal</th>
+                    <th>Abstract</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,6 +74,17 @@
                         {% endif %}
                     </td>
                     <td>{{ row.get('journal_name', row.get('t2', row.get('jo', ''))) }}</td>
+                    <td>
+                        {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
+                        <button class="btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                            onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
+                            View
+                        </button>
+                        {% else %}
+                        <span style="color: var(--color-text-muted); font-size: 0.8rem;">N/A</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -29,21 +29,38 @@
     </div>
 </div>
 
-<!-- Venn Diagram Placeholder (Optional, using simple CSS circles could be cool, but sticking to detailed lists for now) -->
+<!-- Venn Diagram Section -->
+<div class="card mt-2 mb-2">
+    <h3 class="text-center" style="color: var(--color-text)">Overlap Visualization</h3>
+    <div id="venn-container" class="flex justify-center" style="min-height: 350px;"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stats = {
+            unique_a_count: {{ stats.unique_a_count }},
+            overlap_count: {{ stats.overlap_count }},
+            unique_b_count: {{ stats.unique_b_count }},
+            total_a: {{ stats.total_a }},
+            total_b: {{ stats.total_b }}
+        };
+        drawVennDiagram("venn-container", stats, "{{ filename_a }}", "{{ filename_b }}");
+    });
+</script>
 
 <!-- Lists -->
 <div class="mt-2">
-    <!-- Accordion / Tabs could go here, for now just stacked sections -->
-
     <div class="card mb-2">
         <h3 style="color: var(--color-accent)">🔗 Overlap ({{ stats.overlap_count }})</h3>
         <div class="table-container" style="max-height: 400px; overflow-y: auto;">
-            <table>
+            <table id="overlapTable">
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Year</th>
-                        <th>Authors</th>
+                        <th onclick="sortTable(0, 'overlapTable')">Title</th>
+                        <th onclick="sortTable(1, 'overlapTable')">Year</th>
+                        <th onclick="sortTable(2, 'overlapTable')">Type</th>
+                        <th onclick="sortTable(3, 'overlapTable')">Authors</th>
+                        <th>Abstract</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,12 +68,24 @@
                     <tr>
                         <td>{{ row.get('title', row.get('ti', 'N/A')) }}</td>
                         <td>{{ row.get('year', row.get('py', 'N/A')) }}</td>
+                        <td>{{ row.get('type_of_reference', 'UNK') }}</td>
                         <td>
                             {% set authors = row.get('authors', row.get('au', [])) %}
                             {% if authors is sequence and authors is not string %}
                             {{ authors[:2]|join(', ') }}...
                             {% else %}
                             {{ authors }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
+                            <button class="btn"
+                                style="padding: 0.2rem 0.6rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                                onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
+                                View
+                            </button>
+                            {% else %}
+                            <span style="color: var(--color-text-muted); font-size: 0.8rem;">N/A</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -70,11 +99,13 @@
         <div class="card">
             <h3 style="color: var(--color-primary)">Unique to {{ filename_a }}</h3>
             <div class="table-container" style="max-height: 500px; overflow-y: auto;">
-                <table>
+                <table id="uniqueATable">
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Year</th>
+                            <th onclick="sortTable(0, 'uniqueATable')">Title</th>
+                            <th onclick="sortTable(1, 'uniqueATable')">Year</th>
+                            <th onclick="sortTable(2, 'uniqueATable')">Type</th>
+                            <th>Abstract</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,6 +113,18 @@
                         <tr>
                             <td>{{ row.get('title', row.get('ti', 'N/A')) }}</td>
                             <td>{{ row.get('year', row.get('py', 'N/A')) }}</td>
+                            <td>{{ row.get('type_of_reference', 'UNK') }}</td>
+                            <td>
+                                {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
+                                <button class="btn"
+                                    style="padding: 0.2rem 0.6rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                                    onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
+                                    View
+                                </button>
+                                {% else %}
+                                <span style="color: var(--color-text-muted); font-size: 0.8rem;">N/A</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -92,11 +135,13 @@
         <div class="card">
             <h3 style="color: var(--color-secondary)">Unique to {{ filename_b }}</h3>
             <div class="table-container" style="max-height: 500px; overflow-y: auto;">
-                <table>
+                <table id="uniqueBTable">
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Year</th>
+                            <th onclick="sortTable(0, 'uniqueBTable')">Title</th>
+                            <th onclick="sortTable(1, 'uniqueBTable')">Year</th>
+                            <th onclick="sortTable(2, 'uniqueBTable')">Type</th>
+                            <th>Abstract</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,6 +149,18 @@
                         <tr>
                             <td>{{ row.get('title', row.get('ti', 'N/A')) }}</td>
                             <td>{{ row.get('year', row.get('py', 'N/A')) }}</td>
+                            <td>{{ row.get('type_of_reference', 'UNK') }}</td>
+                            <td>
+                                {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
+                                <button class="btn"
+                                    style="padding: 0.2rem 0.6rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                                    onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
+                                    View
+                                </button>
+                                {% else %}
+                                <span style="color: var(--color-text-muted); font-size: 0.8rem;">N/A</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

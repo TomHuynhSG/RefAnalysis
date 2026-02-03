@@ -52,6 +52,10 @@ def parse_ris_lines(lines):
                 current_entry['journal_name'] = value
             elif tag == 'DO':
                 current_entry['doi'] = value
+            elif tag == 'TY':
+                current_entry['type_of_reference'] = value
+            elif tag == 'AB' or tag == 'N2':
+                current_entry['abstract'] = value
                 
             last_tag = key
         else:

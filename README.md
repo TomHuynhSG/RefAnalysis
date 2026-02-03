@@ -10,25 +10,48 @@ A powerful, modular, and user-friendly web application for analyzing and compari
 Upload individual RIS files to get instant insights:
 *   **Statistics Dashboard**: View total references, unique authors, and journal counts.
 *   **Visualizations**: Interactive charts for publications over time and top authors.
-*   **Smart Table**: A sortable, responsive table displaying all references with DOI links.
+*   **Smart Table**: A sortable, responsive table displaying all references:
+    *   **DOI Links**: Direct access to the source.
+    *   **Abstracts**: [New] Click "View" to read full abstracts in a popup modal.
 
 ### 2. ⚖️ Intelligent Comparison
 Compare two RIS datasets (Source A vs. Source B) to handle deduplication and merging:
-*   **Overlap Detection**: Automatically identifies common references using fuzzy matching (Title + Year normalization).
-*   **Unique Reference Lists**: Clearly separates references unique to each source.
+*   **Interactive Venn Diagram**: [New] Visualize the overlap and unique sets with an SVG-based interactive diagram showing counts and percentages.
+*   **Detailed Comparison Tables**: Three distinct lists (Overlap, Unique A, Unique B) with full metadata including **Type** and **Abstract**.
 *   **Conflict Resolution Support**: Helps researchers merge libraries without duplicates.
 
 ### 3. 🎨 Premium Experience
-*   **Modern Design**: Dark mode aesthetic with glassmorphism elements and deep gradients.
-*   **Responsive**: Fully functional on desktop, tablet, and mobile.
+*   **Modern Design**: Dark mode aesthetic with glassmorphism elements, deep gradients, and interactive animations.
+*   **Responsive**: Optimized layout with maximized screen real estate.
 *   **Fast**: Built with lightweight Vanilla CSS and optimized Python logic.
+
+## 🧠 Technical Deep Dive: Matching Strategy
+
+The core of the comparison engine uses a robust, fuzzy-matching algorithm to identify duplicates across heterogeneous data sources.
+
+### 1. Key Generation
+The system generates a unique fingerprint for each reference using a waterfall strategy:
+1.  **DOI Match (Exact)**: If a DOI (`DO` tag) is present, it is used as the primary key. DOIs are normalized (trimmed, lowercased).
+    *   *Example*: `DOI:10.1234/jft.2023.001`
+2.  **Title + Year (Fuzzy)**: If no DOI is found, a composite key is generated:
+    *   **Title Normalization**: Lowercase, remove all non-alphanumeric characters.
+    *   **Year Normalization**: Extract first 4 digits.
+    *   *Example*: `TY:theimpactofaionsociety_2023`
+
+### 2. Comparison Logic
+*   **Overlap**: References present in both Set A and Set B (Intersection of Keys).
+*   **Unique A**: References in Set A but not in Set B (Set Difference A - B).
+*   **Unique B**: References in Set B but not in Set A (Set Difference B - A).
+
+### 3. Fuzzy Title Matching (Advanced)
+For cases where titles might have slight variations (e.g., "The Impact of AI" vs "Impact of AI"), a `SequenceMatcher` is available in the codebase to detect similarity ratios > 0.9, ensuring high-confidence deduplication even with typo-prone data.
 
 ## 🛠️ Tech Stack
 
 *   **Backend**: Python 3, Flask
-*   **Frontend**: HTML5, Vanilla CSS (Custom properties & Flexbox/Grid), JavaScript
+*   **Frontend**: HTML5, Vanilla CSS (CSS Variables, Flexbox/Grid), JavaScript
 *   **Data Processing**: Pandas, OpenPyXL
-*   **Visualization**: Chart.js
+*   **Visualization**: Chart.js (Analysis), Custom SVG (Comparison)
 
 ## 📦 Installation
 
@@ -66,22 +89,14 @@ references_compare_analysis/
 ├── app.py                 # Main Flask Application
 ├── requirements.txt       # Python Dependencies
 ├── src/
-│   ├── parser.py          # Custom robust RIS parser
+│   ├── parser.py          # Custom robust RIS parser (Handles TY, AB, etc.)
 │   ├── analyzer.py        # Statistical analysis logic
 │   └── comparator.py      # Fuzzy matching & comparison algorithms
 ├── static/
-│   ├── css/               # Modern CSS Design System
-│   └── js/                # Client-side interactions
+│   ├── css/               # Modern CSS Design System (style.css, ven.css)
+│   └── js/                # Client-side interactions (main.js, venn.js)
 └── templates/             # Jinja2 HTML Templates
 ```
-
-## 🔮 Future Roadmap
-
-The system is designed to be modular. Future extensions could include:
-*   **Export Functionality**: Export comparison results to CSV/Excel or new RIS files.
-*   **Advanced Deduplication**: Configurable similarity thresholds for matching.
-*   **BibTeX Support**: Add parsers for other citation formats.
-*   **User Accounts**: Save analysis history and managed libraries.
 
 ## 📄 License
 

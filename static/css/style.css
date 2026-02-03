@@ -48,9 +48,9 @@ a:hover {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 95%;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 /* Glassmorphism Cards */
@@ -184,6 +184,10 @@ tr:hover {
     justify-content: space-between;
 }
 
+.justify-center {
+    justify-content: center;
+}
+
 .items-center {
     align-items: center;
 }
@@ -192,4 +196,79 @@ tr:hover {
     .grid-2 {
         grid-template-columns: 1fr;
     }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: var(--color-surface);
+    margin: 10% auto;
+    padding: 2rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 16px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: var(--shadow-lg), var(--shadow-neon);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    color: var(--color-text-muted);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--color-accent);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-text {
+    margin-top: 1rem;
+    line-height: 1.8;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Venn Diagram Styles */
+.venn-circle {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.venn-circle:hover {
+    fill-opacity: 0.4;
+    stroke-width: 4;
+    filter: url(#glow);
 }
