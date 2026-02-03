@@ -3,7 +3,7 @@
 {% block content %}
 <div class="mb-2 flex justify-between items-center">
     <h2>Analysis Report: <span style="color: var(--color-primary)">{{ filename }}</span></h2>
-    <a href="/" class="btn" style="background: var(--color-surface); border: 1px solid var(--color-text-muted);">←
+    <a href="/" class="btn btn-light">←
         Back</a>
 </div>
 
@@ -76,8 +76,7 @@
                     <td>{{ row.get('journal_name', row.get('t2', row.get('jo', ''))) }}</td>
                     <td>
                         {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
-                        <button class="btn"
-                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                        <button class="btn btn-sm"
                             onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
                             View
                         </button>

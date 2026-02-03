@@ -74,13 +74,14 @@ a:hover {
 /* Buttons */
 .btn {
     display: inline-block;
-    padding: 0.8rem 1.5rem;
+    padding: 0.9rem 1.8rem;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    border: none;
+    border: 2px solid transparent;
     transition: all 0.3s ease;
     font-family: var(--font-heading);
+    font-size: 0.95rem;
 }
 
 .btn-primary {
@@ -92,6 +93,40 @@ a:hover {
 .btn-primary:hover {
     box-shadow: 0 6px 20px hsla(var(--hue-primary), 60%, 40%, 0.6);
     transform: translateY(-2px);
+}
+
+/* Light styled buttons for better visibility */
+.btn-light {
+    background: white;
+    color: #1a1a2e;
+    border: 2px solid hsla(220, 20%, 80%, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 0.9rem;
+    padding: 0.65rem 1.3rem;
+}
+
+.btn-light:hover {
+    background: #f0f0f0;
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 212, 244, 0.3);
+}
+
+/* Small buttons for table actions */
+.btn-sm {
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
+    background: white;
+    color: #1a1a2e;
+    border: 1px solid hsla(220, 20%, 80%, 0.4);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-sm:hover {
+    background: #f8f8f8;
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 255, 170, 0.2);
 }
 
 /* Forms */

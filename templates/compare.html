@@ -4,7 +4,7 @@
 <div class="mb-2 flex justify-between items-center">
     <h2>Comparison: <span style="color: var(--color-primary)">{{ filename_a }}</span> vs <span
             style="color: var(--color-secondary)">{{ filename_b }}</span></h2>
-    <a href="/" class="btn" style="background: var(--color-surface); border: 1px solid var(--color-text-muted);">←
+    <a href="/" class="btn btn-light">←
         Back</a>
 </div>
 
@@ -13,11 +13,10 @@
     <div class="card text-center" style="border-top: 4px solid var(--color-primary)">
         <h4 style="color: var(--color-primary)">Unique to A</h4>
         <h1 style="margin: 0;">{{ stats.unique_a_count }}</h1>
-        <small style="color: var(--color-text-muted)">{{ (stats.unique_a_count / stats.total_a * 100)|round(1) }}% of A / {{ stats.total_a }}</small>
+        <small style="color: var(--color-text-muted)">({{ (stats.unique_a_count / stats.total_a * 100)|round(1) }}%) of A out of {{ stats.total_a }} total references</small>
         <div class="mt-1">
             <a href="{{ url_for('export_ris', filename_a=filename_a, filename_b=filename_b, subset='unique_a') }}"
-                class="btn"
-                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary); color: var(--color-primary);">
+                class="btn btn-light">
                 ⬇ Export RIS
             </a>
         </div>
@@ -28,8 +27,7 @@
         <small style="color: var(--color-text-muted)">Common References</small>
         <div class="mt-1">
             <a href="{{ url_for('export_ris', filename_a=filename_a, filename_b=filename_b, subset='overlap') }}"
-                class="btn"
-                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-accent); color: var(--color-accent);">
+                class="btn btn-light">
                 ⬇ Export RIS
             </a>
         </div>
@@ -37,11 +35,10 @@
     <div class="card text-center" style="border-top: 4px solid var(--color-secondary)">
         <h4 style="color: var(--color-secondary)">Unique to B</h4>
         <h1 style="margin: 0;">{{ stats.unique_b_count }}</h1>
-        <small style="color: var(--color-text-muted)">{{ (stats.unique_b_count / stats.total_b * 100)|round(1) }}% of B / {{ stats.total_b }}</small>
+        <small style="color: var(--color-text-muted)">({{ (stats.unique_b_count / stats.total_b * 100)|round(1) }}%) of B out of {{ stats.total_b }} total references</small>
         <div class="mt-1">
             <a href="{{ url_for('export_ris', filename_a=filename_a, filename_b=filename_b, subset='unique_b') }}"
-                class="btn"
-                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-secondary); color: var(--color-secondary);">
+                class="btn btn-light">
                 ⬇ Export RIS
             </a>
         </div>
@@ -98,8 +95,7 @@
                         </td>
                         <td>
                             {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
-                            <button class="btn"
-                                style="padding: 0.2rem 0.6rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                            <button class="btn btn-sm"
                                 onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
                                 View
                             </button>
@@ -135,8 +131,7 @@
                             <td>{{ row.get('type_of_reference', 'UNK') }}</td>
                             <td>
                                 {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
-                                <button class="btn"
-                                    style="padding: 0.2rem 0.6rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                                <button class="btn btn-sm"
                                     onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
                                     View
                                 </button>
@@ -171,8 +166,7 @@
                             <td>{{ row.get('type_of_reference', 'UNK') }}</td>
                             <td>
                                 {% if row.get('abstract') or row.get('ab') or row.get('n2') %}
-                                <button class="btn"
-                                    style="padding: 0.2rem 0.6rem; font-size: 0.8rem; background: var(--color-surface); border: 1px solid var(--color-primary);"
+                                <button class="btn btn-sm"
                                     onclick='openModal({{ (row.get("abstract") or row.get("ab") or row.get("n2"))|tojson }})'>
                                     View
                                 </button>
