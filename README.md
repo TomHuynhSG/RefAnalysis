@@ -11,20 +11,56 @@ A powerful, modular, and user-friendly web application for analyzing and compari
   - Interactive charts (publications over time, top contributors).
   - Sortable, interactive reference table with abstract previews.
 - **⚖️ Dataset Comparison**: Upload two RIS files (A and B) for side-by-side comparison:
-  - **Overlap**: References found in both A and B.
-  - **Unique to A** / **Unique to B**: Identify entries exclusive to each dataset.
-  - Visual **Venn diagram** for at-a-glance overlap visualization.
-  - Interactive sortable tables for each subset (overlap, unique A, unique B).
+
+### 2. Dataset Comparison
+
+Compare two RIS datasets to identify overlapping and unique references. Uses intelligent title normalization and fuzzy matching for accurate comparison.
+
+- **Overlap**: References found in both A and B.
+- **Unique to A** / **Unique to B**: Identify entries exclusive to each dataset.
+- Visual **Venn diagram** for at-a-glance overlap visualization.
+- Interactive sortable tables for each subset (overlap, unique A, unique B).
 
 ![Dataset Comparison with Venn Diagram](screenshots/compare.png)
 _Visual comparison showing overlap and unique references between two datasets_
 
-- **🔄 Multi-File Deduplication** 🆕: Upload multiple RIS files at once:
-  - Automatically removes duplicates across all files.
-  - **Unique References Table**: Shows final deduplicated list with source tracking.
-  - **Removed Duplicates Table**: Displays which duplicates were removed and from which files.
-  - Export either table as RIS format.
-  - Source tracking shows which files each reference appears in.
+### 3. Search Query Effectiveness
+
+Test Boolean search queries against RIS files to evaluate search strategy effectiveness before running database searches.
+
+**Features:**
+
+- **Complex Boolean Logic**: Supports AND/OR operators with parentheses for query structure
+- **Wildcard Matching**: Use `*` for flexible term matching (e.g., `assess*` matches "assess", "assessment", "assessing")
+- **Phrase Search**: Use quotes for exact phrases (e.g., `"risk of bias"`)
+- **Field Selection**: Search within specific fields (Title, Abstract, Keywords)
+- **Smart Highlighting**:
+  - Matched references show all matching terms highlighted in yellow
+  - Unmatched references show partial matches to understand why they didn't qualify
+  - Maximizes distinct highlights for better visibility
+- **Match Statistics**: View match count, percentage, and total occurrences per reference
+- **Re-query Support**: Refine queries without re-uploading files
+- **Export Results**: Download matched or unmatched references as RIS files
+
+**Example Query:**
+
+```
+("Large Language Model*" OR "LLM*" OR "GPT*")
+AND
+("Risk of bias" OR "bias assessment*")
+AND
+("automat*" OR "evaluat*")
+```
+
+### 4. Multi-file Deduplication 🆕
+
+Upload multiple RIS files at once:
+
+- Automatically removes duplicates across all files.
+- **Unique References Table**: Shows final deduplicated list with source tracking.
+- **Removed Duplicates Table**: Displays which duplicates were removed and from which files.
+- Export either table as RIS format.
+- Source tracking shows which files each reference appears in.
 
 ![Multi-File Deduplication Results](screenshots/deduplicate.png)
 _Deduplication interface showing unique references and removed duplicates with source tracking_
@@ -106,7 +142,7 @@ Deduplication Result:
 - ✅ Clear provenance - users see which files contributed each reference
 - ✅ Clean export - metadata removed when exporting to RIS format
 
-### 4. **NEW: Active Fuzzy Matching** 🆕
+### 4. **Active Fuzzy Matching** 🆕
 
 For cases where titles might have slight variations (e.g., "Machine Learning" vs "Machine Learing"), a secondary fuzzy matching pass is performed:
 
@@ -115,7 +151,54 @@ For cases where titles might have slight variations (e.g., "Machine Learning" vs
 - Catches typos and minor title variations
 - Can be disabled with `use_fuzzy=False` parameter
 
-### 4. **Improvements Summary** 🚀
+### 5. **Search Engine Logic** 🆕
+
+The search feature is powered by a custom-built Boolean search engine (`src/search_engine.py`) and recursive descent parser (`src/query_parser.py`):
+
+#### **A. Abstract Syntax Tree (AST)**
+
+Queries are parsed into an AST for robust evaluation.
+
+- `("A" OR "B") AND "C"` becomes:
+  ```text
+      AND
+     /   \
+    OR    C
+   /  \
+  A    B
+  ```
+- This ensures correct operator precedence (AND > OR) and handling of nested parentheses.
+
+#### **B. Smart Wildcard & Regex Generation**
+
+Wildcards (`*`) are converted to regular expressions with strict boundary control to prevent false positives:
+
+- **Logic**: `*` becomes `\w*` (word characters only), NOT dot-star `.*` (which is too greedy).
+- **Boundaries**:
+  - `assess*` -> `\bassess\w*\b` (Matches "assessment" but not "reassess")
+  - `*bias` -> `\b\w*bias\b` (Matches "risk-of-bias")
+  - `*network*` -> `\b\w*network\w*\b`
+
+#### **C. Highlighting Algorithm**
+
+To provide the most useful visual feedback, the highlighting engine uses a **greedy maximization strategy**:
+
+1.  Finds **all** possible matches (overlapping phrases, single words).
+2.  Prioritizes maximizing the **count of distinct highlighted terms** rather than just length.
+3.  _Example_: For "Automated Risk-of-Bias Assessment":
+    - OLD: Highlighted "Bias Assessment" (1 match)
+    - NEW: Highlights "Automated", "Risk-of-Bias", "Assessment" (3 matches)
+
+#### **D. Partial Matching in Unmatched References**
+
+The evaluation logic tracks matches at the field level independently of the Boolean result.
+
+- If a query is `("A" AND "B")` and a reference only has "A":
+- The reference is marked matches=False (unmatched).
+- BUT "A" is still stored in `field_matches` and highlighted.
+- This helps users understand **why** a reference failed the criteria (e.g., "It has 'ChatGPT' but is missing 'Risk Assessment'").
+
+### 6. **Improvements Summary** 🚀
 
 **Recent enhancements** (Feb 2026):
 
@@ -123,6 +206,7 @@ For cases where titles might have slight variations (e.g., "Machine Learning" vs
 - ✅ Active fuzzy matching for typos - **+1-2% accuracy**
 - ✅ Year validation to prevent false matches
 - ✅ Match confidence scoring (0.0-1.0)
+- ✅ **Boolean Search Engine** with AST parsing and smart highlighting
 - ✅ All improvements tested and validated
 
 **Overall Match Accuracy**: ~96-98% (improved from ~90%)
@@ -175,7 +259,11 @@ references_compare_analysis/
 ├── src/
 │   ├── parser.py          # Custom robust RIS parser (Handles TY, AB, etc.)
 │   ├── analyzer.py        # Statistical analysis logic
-│   └── comparator.py      # Fuzzy matching & comparison algorithms
+│   ├── comparator.py      # Fuzzy matching & comparison algorithms
+│   ├── deduplicator.py    # Multi-file deduplication logic
+│   ├── query_parser.py    # Boolean query parser with AST generation
+│   ├── search_engine.py   # Search execution with highlighting
+│   └── exporter.py        # RIS export functionality
 ├── static/
 │   ├── css/               # Modern CSS Design System (style.css, ven.css)
 │   └── js/                # Client-side interactions (main.js, venn.js)

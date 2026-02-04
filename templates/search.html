@@ -184,10 +184,21 @@
                     {% for row in unmatched_refs %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td>{{ row.get('title', row.get('ti', 'N/A')) }}</td>
+                        <td>
+                            {% if row.get('title_highlighted') %}
+                                {{ row.title_highlighted|safe }}
+                            {% elif row.get('ti_highlighted') %}
+                                {{ row.ti_highlighted|safe }}
+                            {% else %}
+                                {{ row.get('title', row.get('ti', 'N/A')) }}
+                            {% endif %}
+                        </td>
                         <td style="font-size: 0.9rem; line-height: 1.6; word-wrap: break-word;">
                             {% set abstract = row.get('abstract') or row.get('ab') or row.get('n2') %}
-                            {% if abstract %}
+                            {% set abstract_highlighted = row.get('abstract_highlighted') or row.get('ab_highlighted') or row.get('n2_highlighted') %}
+                            {% if abstract_highlighted %}
+                                <div style="word-wrap: break-word; overflow-wrap: break-word;">{{ abstract_highlighted|safe }}</div>
+                            {% elif abstract %}
                                 <div style="word-wrap: break-word; overflow-wrap: break-word; color: var(--color-text-muted);">{{ abstract }}</div>
                             {% else %}
                                 <span style="color: var(--color-text-muted); font-size: 0.8rem;">N/A</span>

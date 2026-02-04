@@ -73,10 +73,13 @@
         <label for="search_ris_file">Upload RIS File</label>
         <input type="file" id="search_ris_file" name="ris_file" accept=".ris" required>
 
-        <label for="query">Search Query</label>
-        <textarea id="query" name="query" rows="5" required
-            placeholder='Example: ("Large Language Model*" OR "LLM*" OR "GPT*") AND ("Risk of bias" OR "RoB") AND ("automat*" OR "assist*")'
+        <label for="search_query">Search Query (Boolean):</label>
+        <textarea id="search_query" name="query" rows="4" required
+            placeholder="Example: (&quot;systematic review*&quot; OR &quot;meta-analys*&quot; OR &quot;scoping review&quot;) AND (&quot;climat* change&quot; OR &quot;global warming&quot; OR &quot;environment* impact*&quot;) AND (&quot;assess*&quot; OR &quot;evaluat*&quot; OR &quot;measur*&quot;)"
             style="font-family: 'Courier New', monospace; font-size: 14px; width: 100%; padding: 0.75rem; border: 2px solid var(--color-border); border-radius: 8px; background: var(--color-bg-secondary); color: var(--color-text); resize: vertical;"></textarea>
+        <small style="color: var(--color-text-muted); display: block; margin-top: 0.5rem;">
+            Supports: AND, OR, parentheses, "quotes for phrases", and * wildcards
+        </small>
 
         <label>Search in:</label>
         <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap;">

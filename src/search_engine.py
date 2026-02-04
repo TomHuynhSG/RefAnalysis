@@ -97,6 +97,7 @@ def evaluate_ast(node: ASTNode, reference: Dict[str, Any], fields: List[str]) ->
         
     Returns:
         (matched: bool, field_matches: Dict[field_name -> Set[matched_terms]])
+        field_matches contains ALL matches found, even if the boolean result is False
     """
     if isinstance(node, TermNode):
         # Leaf node - check if term matches in any selected field
@@ -134,27 +135,20 @@ def evaluate_ast(node: ASTNode, reference: Dict[str, Any], fields: List[str]) ->
         left_match, left_field_matches = evaluate_ast(node.left, reference, fields)
         right_match, right_field_matches = evaluate_ast(node.right, reference, fields)
         
+        # Always merge ALL matches from both sides, regardless of boolean result
+        combined_matches = {}
+        for field in set(left_field_matches.keys()) | set(right_field_matches.keys()):
+            combined_matches[field] = left_field_matches.get(field, set()) | right_field_matches.get(field, set())
+        
         if node.operator == 'AND':
-            # Both must match
-            if left_match and right_match:
-                # Merge field matches from both sides
-                combined_matches = {}
-                for field in set(left_field_matches.keys()) | set(right_field_matches.keys()):
-                    combined_matches[field] = left_field_matches.get(field, set()) | right_field_matches.get(field, set())
-                return True, combined_matches
-            else:
-                return False, {}
+            # Both must match for boolean result to be True
+            # But we still return all partial matches
+            return (left_match and right_match), combined_matches
         
         elif node.operator == 'OR':
-            # Either can match
-            if left_match or right_match:
-                # Merge field matches from both sides
-                combined_matches = {}
-                for field in set(left_field_matches.keys()) | set(right_field_matches.keys()):
-                    combined_matches[field] = left_field_matches.get(field, set()) | right_field_matches.get(field, set())
-                return True, combined_matches
-            else:
-                return False, {}
+            # Either can match for boolean result to be True
+            # And we return all partial matches
+            return (left_match or right_match), combined_matches
     
     return False, {}
 
@@ -315,7 +309,22 @@ def search_references(
             ref_copy['match_count'] = len(all_matched_terms)  # Total occurrences
             matched_refs.append(ref_copy)
         else:
-            unmatched_refs.append(reference)
+            # Even for unmatched, apply highlighting for any partial matches
+            ref_copy = reference.copy()
+            
+            # Highlight title if there were any title matches (even if query failed overall)
+            if 'title' in field_matches:
+                for col in ['title', 'ti', 'primary_title']:
+                    if col in ref_copy and ref_copy[col]:
+                        ref_copy[f'{col}_highlighted'] = highlight_text(ref_copy[col], field_matches['title'])
+            
+            # Highlight abstract if there were any abstract matches
+            if 'abstract' in field_matches:
+                for col in ['abstract', 'ab', 'n2']:
+                    if col in ref_copy and ref_copy[col]:
+                        ref_copy[f'{col}_highlighted'] = highlight_text(ref_copy[col], field_matches['abstract'])
+            
+            unmatched_refs.append(ref_copy)
 
     
     # Calculate statistics
