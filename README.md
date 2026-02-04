@@ -45,11 +45,11 @@ Test Boolean search queries against RIS files to evaluate search strategy effect
 **Example Query:**
 
 ```
-("Large Language Model*" OR "LLM*" OR "GPT*")
+("systematic review*" OR "meta-analys*" OR "scoping review")
 AND
-("Risk of bias" OR "bias assessment*")
+("climat* change" OR "global warming" OR "environment* impact*")
 AND
-("automat*" OR "evaluat*")
+("assess*" OR "evaluat*" OR "measur*")
 ```
 
 ### 4. Multi-file Deduplication 🆕
@@ -176,8 +176,8 @@ Wildcards (`*`) are converted to regular expressions with strict boundary contro
 - **Logic**: `*` becomes `\w*` (word characters only), NOT dot-star `.*` (which is too greedy).
 - **Boundaries**:
   - `assess*` -> `\bassess\w*\b` (Matches "assessment" but not "reassess")
-  - `*bias` -> `\b\w*bias\b` (Matches "risk-of-bias")
-  - `*network*` -> `\b\w*network\w*\b`
+  - `*warming` -> `\b\w*warming\b` (Matches "global-warming")
+  - `*environment*` -> `\b\w*environment\w*\b`
 
 #### **C. Highlighting Algorithm**
 
@@ -185,9 +185,9 @@ To provide the most useful visual feedback, the highlighting engine uses a **gre
 
 1.  Finds **all** possible matches (overlapping phrases, single words).
 2.  Prioritizes maximizing the **count of distinct highlighted terms** rather than just length.
-3.  _Example_: For "Automated Risk-of-Bias Assessment":
-    - OLD: Highlighted "Bias Assessment" (1 match)
-    - NEW: Highlights "Automated", "Risk-of-Bias", "Assessment" (3 matches)
+3.  _Example_: For "Global Climate Change Impacts":
+    - OLD: Highlighted "Climate Change" (1 match)
+    - NEW: Highlights "Global", "Climate Change", "Impacts" (3 matches)
 
 #### **D. Partial Matching in Unmatched References**
 
@@ -196,7 +196,7 @@ The evaluation logic tracks matches at the field level independently of the Bool
 - If a query is `("A" AND "B")` and a reference only has "A":
 - The reference is marked matches=False (unmatched).
 - BUT "A" is still stored in `field_matches` and highlighted.
-- This helps users understand **why** a reference failed the criteria (e.g., "It has 'ChatGPT' but is missing 'Risk Assessment'").
+- This helps users understand **why** a reference failed the criteria (e.g., "It has 'Climate Change' but is missing 'Systematic Review'").
 
 ### 6. **Improvements Summary** 🚀
 
